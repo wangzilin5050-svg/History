@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blooket Gold Quest: 历史金币大冒险</title>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --gold: #fbbf24;
+      --gold-dark: #d97706;
+      --gold-deep: #b45309;
+      --success: #10b981;
+      --success-dark: #047857;
+      --danger: #ef4444;
+      --danger-dark: #b91c1c;
+      --purple: #8b5cf6;
+      --purple-dark: #6d28d9;
+      --bg-sky: #38bdf8;
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: radial-gradient(circle at 50% 20%, #60a5fa, #1e40af 90%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    /* Blooket Chunky 3D Button Style */
+    .btn-3d {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      padding: 14px 28px;
+      border-radius: 18px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.08s ease-in-out;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-3d:active {
+      transform: translateY(6px);
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #78350f;
+      box-shadow: 0 7px 0 var(--gold-dark), 0 12px 16px rgba(0,0,0,0.25);
+    }
+    .btn-gold:active {
+      box-shadow: 0 1px 0 var(--gold-dark), 0 3px 6px rgba(0,0,0,0.2);
+    }
+
+    .btn-green {
+      background: #34d399;
+      color: #064e3b;
+      box-shadow: 0 7px 0 var(--success-dark), 0 12px 16px rgba(0,0,0,0.25);
+    }
+    .btn-green:active {
+      box-shadow: 0 1px 0 var(--success-dark), 0 3px 6px rgba(0,0,0,0.2);
+    }
+
+    .btn-purple {
+      background: #a78bfa;
+      color: #2e1065;
+      box-shadow: 0 7px 0 var(--purple-dark), 0 12px 16px rgba(0,0,0,0.25);
+    }
+    .btn-purple:active {
+      box-shadow: 0 1px 0 var(--purple-dark), 0 3px 6px rgba(0,0,0,0.2);
+    }
+
+    /* Main Container */
+    .game-window {
+      width: 100%;
+      max-width: 820px;
+      min-height: 560px;
+      background: #f8fafc;
+      border-radius: 28px;
+      border: 8px solid #ffffff;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top HUD */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 24px;
+      background: #ffffff;
+      border-bottom: 4px solid #e2e8f0;
+    }
+
+    .hud-left, .hud-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .blook-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #eff6ff;
+      border: 3px solid #bfdbfe;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-weight: 800;
+      color: #1e40af;
+    }
+
+    .blook-avatar-small {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #3b82f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 3px 0 #1d4ed8;
+    }
+
+    .gold-counter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fef3c7;
+      border: 3px solid #fde68a;
+      padding: 6px 16px;
+      border-radius: 16px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #92400e;
+    }
+
+    .coin-icon {
+      display: inline-block;
+      animation: coinBounce 1.5s infinite ease-in-out;
+    }
+
+    @keyframes coinBounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(15deg); }
+    }
+
+    .streak-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fee2e2;
+      border: 3px solid #fecaca;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-weight: 900;
+      color: #b91c1c;
+      font-size: 0.95rem;
+    }
+
+    .audio-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: none;
+      background: #f1f5f9;
+      box-shadow: 0 4px 0 #cbd5e1;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.1s;
+    }
+    .audio-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 #cbd5e1;
+    }
+
+    /* Content Area */
+    .game-content {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .screen {
+      width: 100%;
+      height: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.92); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Start / Blook Picker Screen */
+    .blook-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+      max-width: 520px;
+      width: 100%;
+    }
+
+    .blook-card {
+      background: #ffffff;
+      border: 4px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 0 #cbd5e1;
+      transition: all 0.12s ease;
+    }
+
+    .blook-card:hover {
+      transform: translateY(-4px);
+      border-color: #60a5fa;
+      box-shadow: 0 10px 0 #93c5fd;
+    }
+
+    .blook-card.selected {
+      border-color: var(--primary);
+      background: #eff6ff;
+      box-shadow: 0 6px 0 var(--primary-dark);
+      transform: translateY(2px);
+    }
+
+    .blook-emoji {
+      font-size: 42px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+
+    .blook-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #334155;
+    }
+
+    /* Question Screen */
+    .progress-bar-container {
+      width: 100%;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 2px solid #cbd5e1;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #3b82f6);
+      transition: width 0.3s ease;
+    }
+
+    .question-box {
+      background: #ffffff;
+      border: 4px solid #e2e8f0;
+      border-radius: 22px;
+      padding: 24px;
+      width: 100%;
+      box-shadow: 0 8px 0 #e2e8f0;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .question-category {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .question-text {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.45;
+      color: #1e293b;
+      text-align: left;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      width: 100%;
+    }
+
+    .opt-btn {
+      background: #ffffff;
+      border: 4px solid #cbd5e1;
+      border-radius: 18px;
+      padding: 18px 20px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #334155;
+      box-shadow: 0 6px 0 #cbd5e1;
+      transition: all 0.08s ease;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 76px;
+    }
+
+    .opt-btn:hover {
+      border-color: #93c5fd;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #93c5fd;
+    }
+
+    .opt-btn:active {
+      transform: translateY(6px);
+      box-shadow: 0 0 0 #cbd5e1;
+    }
+
+    .opt-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #f1f5f9;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      flex-shrink: 0;
+      border: 2px solid #cbd5e1;
+    }
+
+    /* Chest Screen (Gold Quest) */
+    .chest-title {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #b45309;
+      margin-bottom: 6px;
+      text-shadow: 0 2px 0 #fde68a;
+    }
+
+    .chest-subtitle {
+      font-size: 1.1rem;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 30px;
+    }
+
+    .chests-container {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    .chest-card {
+      width: 160px;
+      height: 180px;
+      background: #ffffff;
+      border: 5px solid var(--gold);
+      border-radius: 24px;
+      box-shadow: 0 10px 0 var(--gold-dark), 0 15px 25px rgba(0,0,0,0.15);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: chestFloat 2s infinite ease-in-out;
+    }
+
+    .chest-card:nth-child(2) { animation-delay: 0.3s; }
+    .chest-card:nth-child(3) { animation-delay: 0.6s; }
+
+    @keyframes chestFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .chest-card:hover {
+      transform: translateY(-12px) scale(1.05);
+      box-shadow: 0 16px 0 var(--gold-dark), 0 20px 30px rgba(0,0,0,0.2);
+    }
+
+    .chest-card:active {
+      transform: translateY(6px);
+      box-shadow: 0 2px 0 var(--gold-dark);
+    }
+
+    .chest-icon {
+      font-size: 64px;
+      filter: drop-shadow(0 6px 6px rgba(0,0,0,0.15));
+    }
+
+    .chest-label {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #92400e;
+    }
+
+    /* Chest Reward Popup */
+    .reward-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      backdrop-filter: blur(4px);
+    }
+    .reward-overlay.active {
+      display: flex;
+    }
+
+    .reward-modal {
+      background: #ffffff;
+      border-radius: 28px;
+      border: 8px solid var(--gold);
+      padding: 36px 40px;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .reward-icon-huge {
+      font-size: 80px;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.2));
+    }
+
+    .reward-text-main {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #b45309;
+      margin-bottom: 8px;
+    }
+
+    .reward-text-sub {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 24px;
+    }
+
+    /* Incorrect Review Card */
+    .review-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      backdrop-filter: blur(4px);
+    }
+    .review-overlay.active {
+      display: flex;
+    }
+
+    .review-card {
+      background: #ffffff;
+      border-radius: 28px;
+      border: 8px solid #f87171;
+      padding: 32px;
+      text-align: center;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      animation: popIn 0.3s ease;
+    }
+
+    .review-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #b91c1c;
+      margin-bottom: 8px;
+    }
+
+    .review-explanation {
+      background: #fef2f2;
+      border: 2px dashed #fca5a5;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #991b1b;
+      margin: 16px 0 24px;
+      line-height: 1.5;
+      text-align: left;
+    }
+
+    /* Final Screen */
+    .win-badge {
+      font-size: 76px;
+      margin-bottom: 8px;
+      animation: coinBounce 2s infinite ease-in-out;
+    }
+
+    .win-title {
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+    }
+
+    .win-rank {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #d97706;
+      background: #fef3c7;
+      border: 3px solid #fde68a;
+      padding: 6px 20px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      display: inline-block;
+    }
+
+    .stats-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+      max-width: 520px;
+      margin-bottom: 28px;
+    }
+
+    .stat-pill {
+      background: #ffffff;
+      border: 4px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 5px 0 #e2e8f0;
+    }
+
+    .stat-val {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #1e293b;
+    }
+
+    .stat-lbl {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Floating Coin particles */
+    .coin-particle {
+      position: absolute;
+      pointer-events: none;
+      font-size: 24px;
+      animation: floatUp 1s forwards ease-out;
+      z-index: 100;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.5); }
+    }
+
+    @media (max-width: 640px) {
+      .game-window {
+        border-radius: 20px;
+        min-height: 600px;
+      }
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+      .blook-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .chests-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      .chest-card {
+        width: 100%;
+        max-width: 260px;
+        height: 110px;
+        flex-direction: row;
+      }
+      .chest-icon {
+        font-size: 44px;
+      }
+      .stats-summary {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-window">
+    <!-- Top HUD Bar -->
+    <div class="hud">
+      <div class="hud-left">
+        <div class="blook-badge">
+          <div class="blook-avatar-small" id="hudAvatar">🦊</div>
+          <span id="hudBlookName">小狐狸</span>
+        </div>
+        <div class="streak-badge" id="hudStreakBadge">
+          🔥 <span id="hudStreak">0</span> 连胜
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="gold-counter">
+          <span class="coin-icon">🟡</span>
+          <span id="hudGold">0</span>
+        </div>
+        <button class="audio-btn" id="audioToggleBtn" title="切换音乐">🔊</button>
+      </div>
+    </div>
+
+    <!-- Main Screens Content -->
+    <div class="game-content">
+      
+      <!-- Screen 1: Start & Avatar Selection -->
+      <div class="screen active" id="screenStart">
+        <div style="font-size: 54px; margin-bottom: 8px;">👑</div>
+        <h1 style="font-size: 2.2rem; font-weight: 900; color: #1e3a8a; margin-bottom: 6px;">GOLD QUEST</h1>
+        <p style="font-size: 1.1rem; font-weight: 700; color: #475569; margin-bottom: 14px;">马来西亚历史评估 · 完整金币夺宝试炼</p>
+        
+        <p style="font-weight: 800; color: #64748b; font-size: 0.95rem;">选择你的金币探索角色 (Blook)：</p>
+        <div class="blook-grid" id="blookPicker">
+          <!-- Populated by JS -->
+        </div>
+
+        <button class="btn-3d btn-gold" id="btnStartGame" style="width: 240px;">开始探险 ➔</button>
+      </div>
+
+      <!-- Screen 2: Question View -->
+      <div class="screen" id="screenQuestion">
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+
+        <div class="question-box">
+          <div class="question-category" id="qCategory">历史常识</div>
+          <div class="question-text" id="qText">题目内容加载中...</div>
+        </div>
+
+        <div class="options-grid" id="qOptions">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Screen 3: Mystery Chest Selection -->
+      <div class="screen" id="screenChest">
+        <div class="chest-title">回答正确！🎉</div>
+        <div class="chest-subtitle">挑选一个神秘宝箱，开出惊喜金币！</div>
+
+        <div class="chests-container">
+          <div class="chest-card" onclick="openChest(0)">
+            <div class="chest-icon">🎁</div>
+            <div class="chest-label">1 号宝箱</div>
+          </div>
+          <div class="chest-card" onclick="openChest(1)">
+            <div class="chest-icon">🎁</div>
+            <div class="chest-label">2 号宝箱</div>
+          </div>
+          <div class="chest-card" onclick="openChest(2)">
+            <div class="chest-icon">🎁</div>
+            <div class="chest-label">3 号宝箱</div>
+          </div>
+        </div>
+        <div style="font-weight: 800; color: #94a3b8; font-size: 0.95rem;">连胜越高，宝箱奖励金币越多哦！</div>
+      </div>
+
+      <!-- Screen 4: Final Win Screen -->
+      <div class="screen" id="screenFinal">
+        <div class="win-badge">🏆</div>
+        <div class="win-title">试炼完成！</div>
+        <div class="win-rank" id="winTitleBadge">👑 历史金币大亨</div>
+
+        <div class="stats-summary">
+          <div class="stat-pill">
+            <div class="stat-val" id="finalGold" style="color: #d97706;">0</div>
+            <div class="stat-lbl">累计金币</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-val" id="finalAccuracy" style="color: #059669;">100%</div>
+            <div class="stat-lbl">答题正确率</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-val" id="finalChests" style="color: #7c3aed;">0</div>
+            <div class="stat-lbl">开启宝箱数</div>
+          </div>
+        </div>
+
+        <button class="btn-3d btn-green" id="btnRestart">再玩一次 ↺</button>
+      </div>
+
+      <!-- Overlay: Chest Reward -->
+      <div class="reward-overlay" id="rewardOverlay">
+        <div class="reward-modal">
+          <div class="reward-icon-huge" id="rewardIcon">💰</div>
+          <div class="reward-text-main" id="rewardAmount">+150 金币</div>
+          <div class="reward-text-sub" id="rewardDesc">财源滚滚！金币直线上升！</div>
+          <button class="btn-3d btn-gold" id="btnNextQuestion" style="width: 100%;">下一题 ➔</button>
+        </div>
+      </div>
+
+      <!-- Overlay: Incorrect Review Card -->
+      <div class="review-overlay" id="reviewOverlay">
+        <div class="review-card">
+          <div style="font-size: 54px; margin-bottom: 6px;">💡</div>
+          <div class="review-title">哎呀，差一点！</div>
+          <p style="font-weight: 700; color: #64748b;">别灰心，牢记这个重要知识点：</p>
+          <div class="review-explanation" id="reviewText">
+            正确答案解析加载中...
+          </div>
+          <button class="btn-3d btn-purple" id="btnReviewContinue" style="width: 100%;">继续挑战 ➔</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. QUESTION BANK (Full History Exam Paper - No Soalan/Bahagian mention)
+       ========================================================================== */
+    const QUESTION_BANK = [
+      {
+        category: "君主制度",
+        question: "下列哪些国家在如今依然保存着君主制度？",
+        options: ["泰国 与 文莱", "泰国 与 印度尼西亚", "新加坡 与 登嘉楼", "新加坡 与 印度尼西亚"],
+        correct: 0,
+        explanation: "泰国和文莱在现今仍然保存着君主制度；新加坡与印度尼西亚则为共和国制度。"
+      },
+      {
+        category: "马来语的功用",
+        question: "历史记载中“吉兰丹苏丹以马来语写信给莱特威廉达夫”，这体现了马来语的什么功用？",
+        options: ["沟通语言", "行政语言", "教育语言", "官方语言"],
+        correct: 0,
+        explanation: "苏丹与外国官员之间通过书信来往交流，体现了马来语作为“沟通语言”的功用。"
+      },
+      {
+        category: "语言源流",
+        question: "马来语词汇“negara”（国家）是源自于哪一个外来语？",
+        options: ["梵语 (Sanskrit)", "英语", "荷兰语", "葡萄牙语"],
+        correct: 0,
+        explanation: "“negara”来自于古代传入的梵语（Sanskrit）。"
+      },
+      {
+        category: "早期宗教与外来势力",
+        question: "葡萄牙占领马来半岛时传入、并且信仰“三位一体”的宗教是什么？",
+        options: ["基督教", "佛教", "兴都教", "伊斯兰教"],
+        correct: 0,
+        explanation: "1511年葡萄牙占领马六甲时传入了基督教，其核心信仰包含三一论。"
+      },
+      {
+        category: "君主制演变对比",
+        question: "关于早期马来王国与独立至今君主制度的配对，哪项是正确的？",
+        options: [
+          "早期：大臣协助管理州事务 ； 现代：首相掌管国家行政事务",
+          "早期：国家元首是首脑 ； 现代：苏丹拥有绝对裁决权力",
+          "早期：苏丹根据宪法行使权力 ； 现代：苏丹是所有事务裁决者",
+          "早期：苏丹掌管全国行政 ； 现代：苏丹是州政府行政长官"
+        ],
+        correct: 0,
+        explanation: "早期由大臣（如宰相、天猛公）协助拉惹/苏丹管理；现代君主立宪制下，国家行政事务由首相掌管领导。"
+      },
+      {
+        category: "宗教历史证据",
+        question: "作为证明伊斯兰教早期传入马来半岛的重要考古证据，两块古代石碑的发现地是在哪里？",
+        options: ["登嘉楼 与 吉兰丹", "玻璃市 与 登嘉楼", "森美兰 与 吉兰丹", "玻璃市 与 森美兰"],
+        correct: 0,
+        explanation: "登嘉楼发现的著名石碑（Batu Bersurat Terengganu）和吉兰丹石碑是伊斯兰教传入马来半岛的关键历史实物证据。"
+      },
+      {
+        category: "地方抗争英雄",
+        question: "下列关于地方抗争英雄与所在抗争区域的搭配，哪一组是正确的？",
+        options: [
+          "拿督巴哈曼（彭亨）与 末沙烈（沙巴）",
+          "安德农（霹雳）与 仁答（森美兰）",
+          "多赛益（砂拉越）与 督江谷（彭亨）",
+          "末沙烈（马六甲）与 严端安达（沙巴）"
+        ],
+        correct: 0,
+        explanation: "拿督巴哈曼在彭亨反抗英国参政司；末沙烈则在沙巴对抗北婆罗洲渣打公司。"
+      },
+      {
+        category: "独立先驱",
+        question: "在1946年至1948年期间，哪位争取独立的领袖带领马来人坚决反对“马来亚联邦（Malayan Union）”计划？",
+        options: ["拿督翁嘉化 (Dato' Onn Jaafar)", "东姑阿都拉曼", "敦陈祯禄", "依萨莫哈末"],
+        correct: 0,
+        explanation: "拿督翁嘉化发起并带领马来人反对马来亚联邦计划，并促成了巫统的成立与后续的马来亚联合邦协定。"
+      },
+      {
+        category: "独立代表团",
+        question: "请问以下哪位领袖是前往伦敦谈判的“国家独立代表团”成员之一？",
+        options: ["敦李孝式", "李光耀", "敦陈祯禄", "依萨莫哈末"],
+        correct: 0,
+        explanation: "敦李孝式（Tun H. S. Lee）是代表马华公会与联盟前往伦敦签署独立协议的重要代表团成员。"
+      },
+      {
+        category: "抗殖民英雄",
+        question: "抗英英雄多赛益（Dol Said）誓死保卫的是哪一个历史区域？",
+        options: ["马六甲南宁 (Naning)", "砂拉越泗里街", "彭亨鲁勃德鲁亚", "霹雳巴西沙叻"],
+        correct: 0,
+        explanation: "多赛益是南宁酋长，在南宁战争中坚决抵抗英国征收十分之一抽税的要求。"
+      },
+      {
+        category: "王室传统服饰",
+        question: "关于马来西亚最高统治者的皇家礼帽（Tengkolok Diraja），下列说明哪项是正确的？",
+        options: [
+          "由黑色织锦制成并绣上精致金线",
+          "由纯金铸造并镶满红宝石",
+          "日常系在腰带间作为配饰",
+          "专门由国家元首后佩戴"
+        ],
+        correct: 0,
+        explanation: "皇家礼帽是由黑色马来织锦（Songket）制成，上面绣有精美的金色刺绣，并饰有新月与14角星白金徽章。"
+      },
+      {
+        category: "国家元首职权",
+        question: "根据联邦宪法，下列哪项属于国家元首的法定职权？",
+        options: [
+          "委任首相和内阁成员，以及召开和解散国会",
+          "亲自策划国家所有经济发展计划与预算",
+          "担任内阁首长并主持每周内阁例会",
+          "直接掌管各州的日常地方市政事务"
+        ],
+        correct: 0,
+        explanation: "国家元首有权委任获得国会下议院多数信任的议员为首相，并依据首相建议委任内阁成员；同时拥有召开和解散国会的权力。"
+      },
+      {
+        category: "国语的地位",
+        question: "马来语在学校和高等学府被广泛用作主要教学媒介语，这体现了国语的哪项功用？",
+        options: ["教育语言", "沟通语言", "文学语言", "行政语言"],
+        correct: 0,
+        explanation: "作为传授知识、学术研讨和教学的工具时，国语发挥着“教育语言”的功用。"
+      },
+      {
+        category: "唱国歌礼仪",
+        question: "唱国歌时，全体国民应当遵守哪些基本守则？",
+        options: [
+          "肃立、双脚靠拢、双手垂于两侧且咬字清晰",
+          "坐在椅子上、双脚靠拢并保持微笑",
+          "身体背对国旗以示谦逊低调",
+          "双手交叉放在胸前、随意走动"
+        ],
+        correct: 0,
+        explanation: "唱国歌时必须肃立、双腿并拢、双臂自然垂立身体两侧、咬字清晰、节奏一致，不可嬉闹走动。"
+      },
+      {
+        category: "宪法规定",
+        question: "联邦宪法第152条明确规定，我国的国语和官方语言是什么语言？",
+        options: ["马来语", "英语", "华语", "淡米尔语"],
+        correct: 0,
+        explanation: "马来语为马来西亚联邦宪法所规定的唯一国语和官方语言。"
+      },
+      {
+        category: "国徽象征",
+        question: "在马来西亚国徽中，护卫盾牌的两头马来虎象征着什么精神？",
+        options: ["勇敢 (Keberanian)", "强壮", "敏捷", "权威"],
+        correct: 0,
+        explanation: "国徽上的两头猛虎象征着国民面对挑战时的英勇与无畏精神。"
+      },
+      {
+        category: "国旗条块象征",
+        question: "辉煌条纹（Jalur Gemilang）上的蓝色方块代表什么核心意义？",
+        options: ["各族人民团结一致 (Perpaduan)", "勇敢无畏", "纯洁无暇", "忠于王室君主"],
+        correct: 0,
+        explanation: "深蓝色方块象征多元民族团结一致生活，和睦共处。"
+      },
+      {
+        category: "公民实践",
+        question: "在日常生活中，下列哪项行动最能领会并实践国旗上“蓝色”所象征的含义？",
+        options: [
+          "与各族同胞和睦相处、团结一心遵守国家法规",
+          "在考场上全力以赴争夺全班第一名",
+          "在房间里小心安放国家元首的相框",
+          "每天阅读报纸提升个人的文学修养"
+        ],
+        correct: 0,
+        explanation: "国旗蓝色象征“团结”，各族人民互帮互助、遵守公共秩序正是团结精神的日常实践。"
+      },
+      {
+        category: "国徽历史变迁",
+        question: "在1965年，马来西亚国徽进行了哪项具有历史标志性的修改？",
+        options: [
+          "以马来西亚国花大红花取代原新加坡标志",
+          "把两侧的老虎改为飞龙图案",
+          "将国家格言全部改为英文书写",
+          "移除了沙巴和砂拉越的代表标志"
+        ],
+        correct: 0,
+        explanation: "1965年新加坡退出马来西亚联邦后，原国徽下方中央代表新加坡的标志被替换为国花大红花（Bunga Raya）。"
+      },
+      {
+        category: "国歌常识",
+        question: "马来西亚的国歌歌名是什么？",
+        options: ["Negaraku（我的国家）", "Setia", "Malaysiaku", "Sejahtera Malaysia"],
+        correct: 0,
+        explanation: "我国国歌歌名为《Negaraku》（我的国家），曲调源自霹雳州州歌《Terang Bulan》。"
+      },
+      {
+        category: "效忠君主判断",
+        question: "关于“效忠君主与国家”，下列哪一项叙述是正确的？",
+        options: [
+          "君主是人民的保护伞，效忠君主能保障政治稳定与社会安宁",
+          "效忠君主纯粹是为了从政府那里换取个人的私人好处",
+          "君主只是次要领袖，民众可以随意选择是否效忠",
+          "君主制度已经没有任何历史与国家团结意义"
+        ],
+        correct: 0,
+        explanation: "君主是主权的象征与全民的保护伞，遵从国家原则第二条“忠于君国”有助于维护国家和平发展与政治安定。"
+      },
+      {
+        category: "殖民历史判断",
+        question: "下列关于马来半岛殖民统治的历史叙述，哪项是正确的？",
+        options: [
+          "詹姆斯·布洛克（James Brooke）统治砂拉越并自封“白人拉惹”",
+          "海峡殖民地各州是由英国参政司直接管理",
+          "1511年英国人攻打并占领了马六甲商业中心",
+          "前马来属邦包括了霹雳、彭亨、森美兰和雪兰莪"
+        ],
+        correct: 0,
+        explanation: "布洛克在砂拉越建立了布洛克王朝自称白人拉惹；1511年攻占马六甲的是葡萄牙而非英国；霹彭森雪属于马来联邦（FMS）。"
+      },
+      {
+        category: "国家元首遴选",
+        question: "国家元首是由哪一个机构推举产生的？在登基时必须执行什么程序？",
+        options: [
+          "由马来统治者理事会秘密投票推举产生，登基时举行宣誓仪式",
+          "由全体国民直接普选产生，并在国会举行加冕礼",
+          "由首相单方面指定，并由各州元首直接宣布登基",
+          "由联合国推举产生，并在布城举行签字典礼"
+        ],
+        correct: 0,
+        explanation: "国家元首由九位世袭马来统治者组成的马来统治者理事会按规程推举，当选后在正式仪式上宣誓公正无私治理国家。"
+      },
+      {
+        category: "国徽图案寓意",
+        question: "马来西亚国徽盾牌上方的五把马来短剑（Keris）代表什么？",
+        options: ["前马来属邦五个州属", "国家五大原则", "五位开国功臣", "五大武装部队分支"],
+        correct: 0,
+        explanation: "国徽上部的五把短剑代表前马来属邦（玻璃市、吉打、吉兰丹、登嘉楼和柔佛）。"
+      },
+      {
+        category: "马来语国际影响力",
+        question: "马来语自马六甲王朝便流传甚广。除了马来西亚、印尼与文莱，历史上也有马来语社群分布的国家是？",
+        options: ["越南 (占婆地区) 与 台湾 (部分南岛语系交流)", "法国与德国", "俄罗斯与蒙古", "巴西与智利"],
+        correct: 0,
+        explanation: "南岛语系在古代东南亚及周边（如越南中南部的占婆王国以及南岛语系群落）曾广泛存在语言交流。"
+      },
+      {
+        category: "唱国歌教育指南",
+        question: "在教导低年级学生正确唱国歌时，最重要的三个步骤是什么？",
+        options: [
+          "整齐肃立立正 ➔ 咬字发音清晰 ➔ 深刻领会歌词涵义",
+          "坐稳身体 ➔ 快速拍手 ➔ 随意哼唱调子",
+          "面对同伴 ➔ 大声欢呼 ➔ 挥动双手",
+          "站上座椅 ➔ 戴上墨镜 ➔ 随旋律跳跃"
+        ],
+        correct: 0,
+        explanation: "教导唱国歌需按规矩立正端庄、发音标准节奏协调，并引导孩子理解歌词中对君主与祖国的感恩祈福。"
+      }
+    ];
+
+    /* ==========================================================================
+       2. BLOOK CHARACTERS
+       ========================================================================== */
+    const BLOOKS = [
+      { id: "fox", emoji: "🦊", name: "机智狐" },
+      { id: "panda", emoji: "🐼", name: "武术潘" },
+      { id: "trex", emoji: "🦖", name: "暴龙弟" },
+      { id: "cat", emoji: "🐱", name: "招财喵" },
+      { id: "dog", emoji: "🐶", name: "元气柴" },
+      { id: "bot", emoji: "🤖", name: "电波灵" },
+      { id: "owl", emoji: "🦉", name: "智慧鸮" },
+      { id: "astro", emoji: "🚀", name: "星航客" }
+    ];
+
+    /* ==========================================================================
+       3. WEB AUDIO SYNTHESIZER (Loud Blooket Synth-Pop Style)
+       ========================================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.isMuted = false;
+        this.bgmPlaying = false;
+        this.bgmInterval = null;
+        this.step = 0;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      // Loud Upbeat Blooket Arcade BGM
+      startBGM() {
+        this.init();
+        if (this.bgmPlaying || this.isMuted) return;
+        this.bgmPlaying = true;
+
+        // Bouncy 80s arcade chord progression: C - G - Am - F
+        const leadNotes = [523.25, 659.25, 783.99, 659.25, 392.00, 493.88, 587.33, 493.88, 440.00, 523.25, 659.25, 523.25, 349.23, 440.00, 523.25, 440.00];
+        const bassNotes = [130.81, 130.81, 196.00, 196.00, 98.00, 98.00, 146.83, 146.83, 110.00, 110.00, 164.81, 164.81, 87.31, 87.31, 130.81, 130.81];
+
+        this.bgmInterval = setInterval(() => {
+          if (!this.bgmPlaying || this.isMuted) return;
+          const now = this.ctx.currentTime;
+          const idx = this.step % leadNotes.length;
+
+          // Lead synth (square + lowpass)
+          const oscLead = this.ctx.createOscillator();
+          const gainLead = this.ctx.createGain();
+          oscLead.type = 'triangle';
+          oscLead.frequency.setValueAtTime(leadNotes[idx], now);
+          
+          gainLead.gain.setValueAtTime(0.28, now);
+          gainLead.gain.exponentialRampToValueAtTime(0.005, now + 0.16);
+
+          oscLead.connect(gainLead);
+          gainLead.connect(this.ctx.destination);
+          oscLead.start(now);
+          oscLead.stop(now + 0.18);
+
+          // Punchy Bass
+          const oscBass = this.ctx.createOscillator();
+          const gainBass = this.ctx.createGain();
+          oscBass.type = 'sawtooth';
+          oscBass.frequency.setValueAtTime(bassNotes[idx], now);
+
+          gainBass.gain.setValueAtTime(0.32, now);
+          gainBass.gain.exponentialRampToValueAtTime(0.008, now + 0.14);
+
+          oscBass.connect(gainBass);
+          gainBass.connect(this.ctx.destination);
+          oscBass.start(now);
+          oscBass.stop(now + 0.16);
+
+          this.step++;
+        }, 180);
+      }
+
+      stopBGM() {
+        this.bgmPlaying = false;
+        if (this.bgmInterval) {
+          clearInterval(this.bgmInterval);
+          this.bgmInterval = null;
+        }
+      }
+
+      toggleAudio() {
+        this.isMuted = !this.isMuted;
+        if (this.isMuted) {
+          this.stopBGM();
+        } else {
+          this.startBGM();
+        }
+        return !this.isMuted;
+      }
+
+      // SFX: Correct "Ding-Dong"
+      playCorrect() {
+        if (this.isMuted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        [523.25, 783.99].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, now + i * 0.12);
+          g.gain.setValueAtTime(0.4, now + i * 0.12);
+          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.35);
+          osc.connect(g);
+          g.connect(this.ctx.destination);
+          osc.start(now + i * 0.12);
+          osc.stop(now + i * 0.12 + 0.35);
+        });
+      }
+
+      // SFX: Incorrect Buzz
+      playIncorrect() {
+        if (this.isMuted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(60, now + 0.35);
+        g.gain.setValueAtTime(0.45, now);
+        g.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.connect(g);
+        g.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      }
+
+      // SFX: Chest Open Chime
+      playChestOpen() {
+        if (this.isMuted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        [440, 554.37, 659.25, 880, 1108.7].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, now + i * 0.07);
+          g.gain.setValueAtTime(0.38, now + i * 0.07);
+          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.4);
+          osc.connect(g);
+          g.connect(this.ctx.destination);
+          osc.start(now + i * 0.07);
+          osc.stop(now + i * 0.07 + 0.4);
+        });
+      }
+
+      // SFX: Mega Cheer (Streak/Special)
+      playCheer() {
+        if (this.isMuted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(f, now + i * 0.08);
+          g.gain.setValueAtTime(0.35, now + i * 0.08);
+          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.08 + 0.25);
+          osc.connect(g);
+          g.connect(this.ctx.destination);
+          osc.start(now + i * 0.08);
+          osc.stop(now + i * 0.08 + 0.25);
+        });
+      }
+
+      // SFX: Game Victory Fanfare
+      playVictory() {
+        if (this.isMuted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const notes = [
+          { f: 523.25, d: 0.15 }, { f: 523.25, d: 0.15 }, { f: 523.25, d: 0.15 },
+          { f: 659.25, d: 0.35 }, { f: 587.33, d: 0.15 }, { f: 659.25, d: 0.15 },
+          { f: 783.99, d: 0.6 }
+        ];
+        let t = now;
+        notes.forEach(n => {
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(n.f, t);
+          g.gain.setValueAtTime(0.45, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + n.d);
+          osc.connect(g);
+          g.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + n.d);
+          t += n.d * 0.95;
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    /* ==========================================================================
+       4. GAME STATE MANAGEMENT
+       ========================================================================== */
+    let selectedBlook = BLOOKS[0];
+    let currentIndex = 0;
+    let gold = 0;
+    let streak = 0;
+    let correctCount = 0;
+    let chestsOpened = 0;
+    let shuffledQuestions = [];
+
+    // Initialize UI Elements
+    const screenStart = document.getElementById('screenStart');
+    const screenQuestion = document.getElementById('screenQuestion');
+    const screenChest = document.getElementById('screenChest');
+    const screenFinal = document.getElementById('screenFinal');
+
+    const blookPicker = document.getElementById('blookPicker');
+    const hudAvatar = document.getElementById('hudAvatar');
+    const hudBlookName = document.getElementById('hudBlookName');
+    const hudGold = document.getElementById('hudGold');
+    const hudStreak = document.getElementById('hudStreak');
+    const audioToggleBtn = document.getElementById('audioToggleBtn');
+
+    const rewardOverlay = document.getElementById('rewardOverlay');
+    const reviewOverlay = document.getElementById('reviewOverlay');
+
+    // Build Character Picker
+    function renderBlookPicker() {
+      blookPicker.innerHTML = '';
+      BLOOKS.forEach((b, index) => {
+        const card = document.createElement('div');
+        card.className = `blook-card ${index === 0 ? 'selected' : ''}`;
+        card.innerHTML = `
+          <div class="blook-emoji">${b.emoji}</div>
+          <div class="blook-name">${b.name}</div>
+        `;
+        card.onclick = () => {
+          document.querySelectorAll('.blook-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedBlook = b;
+          hudAvatar.innerText = b.emoji;
+          hudBlookName.innerText = b.name;
+        };
+        blookPicker.appendChild(card);
+      });
+    }
+
+    function switchScreen(screen) {
+      [screenStart, screenQuestion, screenChest, screenFinal].forEach(s => s.classList.remove('active'));
+      screen.classList.add('active');
+    }
+
+    function shuffleArray(arr) {
+      return [...arr].sort(() => Math.random() - 0.5);
+    }
+
+    function updateHUD() {
+      hudGold.innerText = gold.toLocaleString();
+      hudStreak.innerText = streak;
+    }
+
+    function spawnCoinParticles(targetEl) {
+      const rect = targetEl.getBoundingClientRect();
+      for (let i = 0; i < 8; i++) {
+        const coin = document.createElement('div');
+        coin.className = 'coin-particle';
+        coin.innerText = '🟡';
+        coin.style.left = `${rect.left + rect.width / 2 + (Math.random() * 40 - 20)}px`;
+        coin.style.top = `${rect.top + (Math.random() * 20 - 10)}px`;
+        coin.style.setProperty('--dx', `${(Math.random() - 0.5) * 120}px`);
+        coin.style.setProperty('--dy', `${-(Math.random() * 100 + 40)}px`);
+        document.body.appendChild(coin);
+        setTimeout(() => coin.remove(), 1000);
+      }
+    }
+
+    /* ==========================================================================
+       5. GAME FLOW
+       ========================================================================== */
+    function startGame() {
+      sound.init();
+      sound.startBGM();
+      gold = 0;
+      streak = 0;
+      currentIndex = 0;
+      correctCount = 0;
+      chestsOpened = 0;
+      shuffledQuestions = shuffleArray(QUESTION_BANK);
+
+      hudAvatar.innerText = selectedBlook.emoji;
+      hudBlookName.innerText = selectedBlook.name;
+      updateHUD();
+
+      switchScreen(screenQuestion);
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentIndex >= shuffledQuestions.length) {
+        showFinalScreen();
+        return;
+      }
+
+      const q = shuffledQuestions[currentIndex];
+      const progressPercent = (currentIndex / shuffledQuestions.length) * 100;
+      document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+      document.getElementById('qCategory').innerText = q.category;
+      document.getElementById('qText').innerText = q.question;
+
+      const optContainer = document.getElementById('qOptions');
+      optContainer.innerHTML = '';
+
+      // Shuffle options to keep game unpredictable
+      const optionObjs = q.options.map((text, idx) => ({ text, isCorrect: idx === q.correct }));
+      const shuffledOptions = shuffleArray(optionObjs);
+
+      const letterTags = ['A', 'B', 'C', 'D'];
+      shuffledOptions.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerHTML = `
+          <div class="opt-badge">${letterTags[idx]}</div>
+          <div style="flex:1;">${opt.text}</div>
+        `;
+        btn.onclick = () => handleAnswer(opt.isCorrect, q);
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(isCorrect, questionData) {
+      if (isCorrect) {
+        sound.playCorrect();
+        streak++;
+        correctCount++;
+        updateHUD();
+        switchScreen(screenChest);
+      } else {
+        sound.playIncorrect();
+        streak = 0;
+        updateHUD();
+        // Show Review Card before continuing
+        document.getElementById('reviewText').innerText = questionData.explanation;
+        reviewOverlay.classList.add('active');
+      }
+    }
+
+    /* Mystery Chest Outcomes (Blooket Style) */
+    function openChest(chestIndex) {
+      sound.playChestOpen();
+      chestsOpened++;
+      const streakMultiplier = 1 + (streak * 0.15); // reward consecutive answers
+
+      // Random Pool of outcomes
+      const outcomes = [
+        { type: 'gold', val: Math.round(50 * streakMultiplier), text: `+${Math.round(50 * streakMultiplier)} 金币`, desc: "不错的手气！收获了一袋金币！", icon: "💰" },
+        { type: 'gold', val: Math.round(120 * streakMultiplier), text: `+${Math.round(120 * streakMultiplier)} 金币`, desc: "金光闪闪！大笔财富入账！", icon: "🪙" },
+        { type: 'gold', val: Math.round(250 * streakMultiplier), text: `+${Math.round(250 * streakMultiplier)} 金币`, desc: "超级大宝藏！发家致富！", icon: "💎" },
+        { type: 'mega', val: Math.round(500 * streakMultiplier), text: `+${Math.round(500 * streakMultiplier)} MEGA 金币!`, desc: "运气爆棚！挖到了传说中的金矿！", icon: "👑" },
+        { type: 'double', text: "金币翻倍 2X!", desc: "魔法宝箱让你的金币翻了一整倍！", icon: "⚡" },
+        { type: 'prank', text: "恶作剧炸弹! -15%", desc: "哎呀！被调皮鬼偷吃了 15% 的金币！", icon: "💣" }
+      ];
+
+      // Give higher gold chances
+      const roll = Math.random();
+      let picked;
+      if (gold > 300 && roll < 0.15) {
+        picked = outcomes[5]; // Prank Bomb
+      } else if (roll < 0.18) {
+        picked = outcomes[4]; // Double 2X
+      } else if (roll < 0.35) {
+        picked = outcomes[3]; // Mega 500
+      } else if (roll < 0.65) {
+        picked = outcomes[2]; // 250
+      } else if (roll < 0.88) {
+        picked = outcomes[1]; // 120
+      } else {
+        picked = outcomes[0]; // 50
+      }
+
+      // Apply logic
+      if (picked.type === 'double') {
+        gold = gold === 0 ? 100 : gold * 2;
+        sound.playCheer();
+      } else if (picked.type === 'prank') {
+        const loss = Math.round(gold * 0.15);
+        gold = Math.max(0, gold - loss);
+      } else {
+        gold += picked.val;
+      }
+
+      updateHUD();
+      spawnCoinParticles(screenChest);
+
+      // Display Modal
+      document.getElementById('rewardIcon').innerText = picked.icon;
+      document.getElementById('rewardAmount').innerText = picked.text;
+      document.getElementById('rewardDesc').innerText = picked.desc;
+      rewardOverlay.classList.add('active');
+    }
+
+    function advanceToNextQuestion() {
+      rewardOverlay.classList.remove('active');
+      reviewOverlay.classList.remove('active');
+      currentIndex++;
+      switchScreen(screenQuestion);
+      loadQuestion();
+    }
+
+    function showFinalScreen() {
+      sound.stopBGM();
+      sound.playVictory();
+
+      const accuracy = Math.round((correctCount / shuffledQuestions.length) * 100);
+      document.getElementById('finalGold').innerText = gold.toLocaleString();
+      document.getElementById('finalAccuracy').innerText = `${accuracy}%`;
+      document.getElementById('finalChests').innerText = chestsOpened;
+
+      // Assign fun Blooket title
+      const titleBadge = document.getElementById('winTitleBadge');
+      if (gold >= 5000) {
+        titleBadge.innerText = "👑 传奇历史金币神豪";
+      } else if (gold >= 2500) {
+        titleBadge.innerText = "💎 资深皇家大探险家";
+      } else if (gold >= 1000) {
+        titleBadge.innerText = "🪙 历史淘金高手";
+      } else {
+        titleBadge.innerText = "🌱 勤奋历史小学徒";
+      }
+
+      switchScreen(screenFinal);
+    }
+
+    /* ==========================================================================
+       6. EVENT LISTENERS
+       ========================================================================== */
+    document.getElementById('btnStartGame').onclick = startGame;
+    document.getElementById('btnNextQuestion').onclick = advanceToNextQuestion;
+    document.getElementById('btnReviewContinue').onclick = advanceToNextQuestion;
+    document.getElementById('btnRestart').onclick = () => {
+      switchScreen(screenStart);
+    };
+
+    audioToggleBtn.onclick = () => {
+      const active = sound.toggleAudio();
+      audioToggleBtn.innerText = active ? "🔊" : "🔇";
+    };
+
+    // Initialize Picker
+    renderBlookPicker();
+  </script>
+</body>
+</html>
